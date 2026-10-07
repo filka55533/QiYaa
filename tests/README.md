@@ -597,6 +597,10 @@ D-Bus, and OpenGL on a software renderer. This is how they stay stable:
 - **Wall-clock asserts** are loose. `stop()` and `beginStream()` must return within 1,000 ms;
   a real hang takes far longer. `pauseStopsTheClock` compares the position exactly, because
   while paused the clock must not move at all.
+- **Jam retry timing.** The second retry uses a 100 ms delay in `jam_test`. Measure from
+  `Offline` to `Connecting` in the status signal handler and require at least 60 ms. Checking
+  the connection count after `qWait(60)` is unreliable: on a busy runner it can return after
+  the retry has already fired.
 - **The 1000-switch Milkdrop test** is about probability, not time. The old shuffle retried a
   random pick a few times, then fell back to any preset. With 1 of 4 presets black, that picked
   the black one about once in 240 switches. At 30 switches the test failed only now and then;
