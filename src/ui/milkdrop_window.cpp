@@ -297,7 +297,9 @@ int MilkdropWindow::followingPreset() const {
             }
         }
         if (!candidates.isEmpty()) {
-            return candidates.at(int(QRandomGenerator::global()->bounded(candidates.size())));
+            return candidates.at(
+                static_cast<int>(QRandomGenerator::global()->bounded(candidates.size()))
+            );
         }
     } else {
         int index = selectedIndex;

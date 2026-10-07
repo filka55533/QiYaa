@@ -36,7 +36,7 @@ constexpr int kStatusShowMs = 3000;
 const QString kMarqueeSeparator = QStringLiteral("  ***  ");
 
 QString FormatTime(double seconds) {
-    const int wholeSeconds = std::max(0, int(seconds));
+    const int wholeSeconds = std::max(0, static_cast<int>(seconds));
     return QStringLiteral("%1:%2")
         .arg(wholeSeconds / 60)
         .arg(wholeSeconds % 60, 2, 10, QLatin1Char('0'));
@@ -256,7 +256,7 @@ QString MainWindow::marqueeText() const {
         const double duration = corePlayer->durationSeconds();
         return QStringLiteral("SEEK TO: %1/%2 (%3%)")
             .arg(FormatTime(seekPreview * duration), FormatTime(duration))
-            .arg(int(seekPreview * 100));
+            .arg(static_cast<int>(seekPreview * 100));
     }
     const auto* track = corePlayer->currentTrack();
     if (!track) {
@@ -299,8 +299,9 @@ void MainWindow::drawTime(QPainter& painter) const {
     const double position = corePlayer->engine()->positionSeconds();
     const double duration = corePlayer->durationSeconds();
     const bool remaining = remainingTimeShown && duration > 0;
-    const int totalSeconds =
-        remaining ? std::max(0, int(std::ceil(duration - position))) : int(position);
+    const int totalSeconds = remaining
+        ? std::max(0, static_cast<int>(std::ceil(duration - position)))
+        : static_cast<int>(position);
     if (remaining) {
         // Minus sign: its own digit-sized cell in nums_ex.bmp, a 5x1 dash in numbers.bmp.
         if (skin().numbersAreExtended()) {
@@ -338,8 +339,9 @@ QString MainWindow::miniTimeText() const {
     const double position = corePlayer->engine()->positionSeconds();
     const double duration = corePlayer->durationSeconds();
     const bool remaining = remainingTimeShown && duration > 0;
-    const int totalSeconds =
-        remaining ? std::max(0, int(std::ceil(duration - position))) : int(position);
+    const int totalSeconds = remaining
+        ? std::max(0, static_cast<int>(std::ceil(duration - position)))
+        : static_cast<int>(position);
     return QStringLiteral("%1%2:%3")
         .arg(remaining ? QStringLiteral("-") : QString())
         .arg(std::min(totalSeconds / 60, 99))
@@ -379,7 +381,7 @@ void MainWindow::paintShaded(QPainter& painter) {
         const double fraction = seekPreview >= 0
             ? seekPreview
             : std::clamp(corePlayer->engine()->positionSeconds() / duration, 0.0, 1.0);
-        const int x = int(std::lround(fraction * (17 - 3)));
+        const int x = static_cast<int>(std::lround(fraction * (17 - 3)));
         const QRect thumb = x == 0 ? Skins::kShadePositionThumbLeft
             : x >= 14              ? Skins::kShadePositionThumbRight
                                    : Skins::kShadePositionThumb;
@@ -451,7 +453,7 @@ void MainWindow::paintSkin(QPainter& painter) {
             && Skins::Skin::TextWidth(text) > Skins::MainWindowSprites::kMarquee.width();
         if (scroll) {
             const QString loop = text + kMarqueeSeparator;
-            const int loopLength = int(loop.size());
+            const int loopLength = static_cast<int>(loop.size());
             const int offset = loopLength ? marqueeOffset % loopLength : 0;
             text = loop.mid(offset) + loop.left(offset) + loop;
         }
@@ -487,14 +489,14 @@ void MainWindow::paintSkin(QPainter& painter) {
     );
 
     {
-        const int frame = int(std::lround(volumePercent / 100.0 * 28));
+        const int frame = static_cast<int>(std::lround(volumePercent / 100.0 * 28));
         const int offset = std::max(0, (frame - 1) * Skins::kSliderFrameStep);
         activeSkin.draw(
             painter, TSheet::Volume,
             QRect(0, offset, Skins::MainWindowSprites::kVolume.width(), Skins::kSliderFrameHeight),
             Skins::MainWindowSprites::kVolume.topLeft()
         );
-        const int x = int(std::lround(
+        const int x = static_cast<int>(std::lround(
             volumePercent / 100.0
             * (Skins::MainWindowSprites::kVolume.width() - Skins::kVolumeThumb.width())
         ));
@@ -505,13 +507,14 @@ void MainWindow::paintSkin(QPainter& painter) {
         );
     }
     {
-        const int offset = int(std::abs(balancePercent) / 100.0 * 27) * Skins::kSliderFrameStep;
+        const int offset =
+            static_cast<int>(std::abs(balancePercent) / 100.0 * 27) * Skins::kSliderFrameStep;
         activeSkin.draw(
             painter, TSheet::Balance,
             QRect(9, offset, Skins::MainWindowSprites::kBalance.width(), Skins::kSliderFrameHeight),
             Skins::MainWindowSprites::kBalance.topLeft()
         );
-        const int x = int(std::lround(
+        const int x = static_cast<int>(std::lround(
             (balancePercent + 100) / 200.0
             * (Skins::MainWindowSprites::kBalance.width() - Skins::kBalanceThumb.width())
         ));
@@ -545,9 +548,9 @@ void MainWindow::paintSkin(QPainter& painter) {
         const double fraction = seekPreview >= 0
             ? seekPreview
             : std::clamp(corePlayer->engine()->positionSeconds() / duration, 0.0, 1.0);
-        const int x =
-            int(fraction
-                * (Skins::MainWindowSprites::kPosition.width() - Skins::kPositionThumb.width()));
+        const int x = static_cast<int>(
+            fraction * (Skins::MainWindowSprites::kPosition.width() - Skins::kPositionThumb.width())
+        );
         activeSkin.draw(
             painter, TSheet::PosBar,
             pressedElement == Element::Position ? Skins::kPositionThumbSelected
@@ -712,16 +715,16 @@ void MainWindow::skinMouseRelease(QPoint pos, Qt::MouseButton button) {
 void MainWindow::updateSliderFromMouse(Element element, QPoint point) {
     auto fraction = [&](const QRect& rect, int thumbWidth) {
         const double x = point.x() - rect.x() - thumbWidth / 2.0;
-        return std::clamp(x / double(rect.width() - thumbWidth), 0.0, 1.0);
+        return std::clamp(x / static_cast<double>(rect.width() - thumbWidth), 0.0, 1.0);
     };
     switch (element) {
         case Element::Volume:
-            setVolume(int(std::lround(
+            setVolume(static_cast<int>(std::lround(
                 fraction(Skins::MainWindowSprites::kVolume, Skins::kVolumeThumb.width()) * 100
             )));
             break;
         case Element::Balance:
-            setBalance(int(std::lround(
+            setBalance(static_cast<int>(std::lround(
                 fraction(Skins::MainWindowSprites::kBalance, Skins::kBalanceThumb.width()) * 200
                 - 100
             )));
@@ -755,7 +758,9 @@ void MainWindow::activate(Element element) {
         case Element::Repeat: corePlayer->setRepeat(!corePlayer->repeat()); break;
         case Element::EqToggle: Q_EMIT eqToggleRequested(); break;
         case Element::PlaylistToggle: Q_EMIT playlistToggleRequested(); break;
-        case Element::Visualizer: setVisMode(VisMode((int(visualizationMode) + 1) % 3)); break;
+        case Element::Visualizer:
+            setVisMode(static_cast<VisMode>((static_cast<int>(visualizationMode) + 1) % 3));
+            break;
         case Element::Time: setShowsRemainingTime(!remainingTimeShown); break;
         default: break;
     }

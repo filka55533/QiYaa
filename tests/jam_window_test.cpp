@@ -237,7 +237,7 @@ private Q_SLOTS:
         QVERIFY(stack.control(QStringLiteral("Cancel")));
         QTRY_VERIFY(!stack.server.received().isEmpty());
         stack.server.welcome();
-        QTRY_COMPARE(OfType<Jam::Create>(stack.sent()).size(), size_t(1));
+        QTRY_COMPARE(OfType<Jam::Create>(stack.sent()).size(), static_cast<size_t>(1));
         QCOMPARE(OfType<Jam::Create>(stack.sent()).front().hostName, QStringLiteral("Маша"));
     }
 
@@ -257,7 +257,7 @@ private Q_SLOTS:
         QVERIFY(stack.click(QStringLiteral("Start the jam")));
         QTRY_VERIFY(!stack.server.received().isEmpty());
         stack.server.welcome();
-        QTRY_COMPARE(OfType<Jam::Create>(stack.sent()).size(), size_t(1));
+        QTRY_COMPARE(OfType<Jam::Create>(stack.sent()).size(), static_cast<size_t>(1));
         QCOMPARE(OfType<Jam::Create>(stack.sent()).front().hostName, QStringLiteral("Ma"));
     }
 
@@ -271,13 +271,13 @@ private Q_SLOTS:
         const std::optional<Ui::JamWindow::Control> kick = stack.control(QStringLiteral("Remove"));
         QVERIFY(kick);
         QTest::mouseClick(&stack.window, Qt::LeftButton, {}, kick->rect.center());
-        QTRY_COMPARE(OfType<Jam::ChangeSettings>(stack.sent()).size(), size_t(3));
+        QTRY_COMPARE(OfType<Jam::ChangeSettings>(stack.sent()).size(), static_cast<size_t>(3));
         const auto changes = OfType<Jam::ChangeSettings>(stack.sent());
         QCOMPARE(changes[0].settings.order, std::optional(Jam::Order::Fifo));
         QCOMPARE(changes[1].settings.guestsCanSkip, std::optional(true));
         QCOMPARE(changes[2].settings.joinOpen, std::optional(false));
-        QTRY_COMPARE(OfType<Jam::RotateLink>(stack.sent()).size(), size_t(1));
-        QTRY_COMPARE(OfType<Jam::Kick>(stack.sent()).size(), size_t(1));
+        QTRY_COMPARE(OfType<Jam::RotateLink>(stack.sent()).size(), static_cast<size_t>(1));
+        QTRY_COMPARE(OfType<Jam::Kick>(stack.sent()).size(), static_cast<size_t>(1));
         QCOMPARE(OfType<Jam::Kick>(stack.sent()).front().publicId, QStringLiteral("a4n8q1"));
     }
 
@@ -296,7 +296,7 @@ private Q_SLOTS:
         QVERIFY(stack.control(QStringLiteral("Press again to end")));
         QCOMPARE(stack.host.phase(), Jam::HostPhase::Active);
         QVERIFY(stack.click(QStringLiteral("Press again to end")));
-        QTRY_COMPARE(OfType<Jam::End>(stack.sent()).size(), size_t(1));
+        QTRY_COMPARE(OfType<Jam::End>(stack.sent()).size(), static_cast<size_t>(1));
         QCOMPARE(stack.host.phase(), Jam::HostPhase::None);
         QVERIFY(stack.control(QStringLiteral("Start the jam")));
     }
@@ -333,11 +333,11 @@ private Q_SLOTS:
             QStringLiteral("кино")
         );
         QVERIFY(stack.click(QStringLiteral("To the jam")));
-        QTRY_COMPARE(OfType<Jam::Add>(stack.sent()).size(), size_t(1));
+        QTRY_COMPARE(OfType<Jam::Add>(stack.sent()).size(), static_cast<size_t>(1));
         QCOMPARE(OfType<Jam::Add>(stack.sent()).front().track->id, QStringLiteral("11"));
         QCOMPARE(stack.status.last().at(0).toString(), QStringLiteral("Sent to the jam"));
         QVERIFY(stack.click(QStringLiteral("Next")));
-        QTRY_COMPARE(OfType<Jam::Add>(stack.sent()).size(), size_t(2));
+        QTRY_COMPARE(OfType<Jam::Add>(stack.sent()).size(), static_cast<size_t>(2));
     }
 
     void looksLikeTheSkin_data() {

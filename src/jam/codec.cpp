@@ -144,7 +144,8 @@ public:
             return 0;
         }
         const double number = value.toDouble();
-        if (std::floor(number) != number || number < double(minimum) || number > double(maximum)) {
+        if (std::floor(number) != number || number < static_cast<double>(minimum)
+            || number > static_cast<double>(maximum)) {
             fail(
                 key,
                 QStringLiteral("is %1, not a whole number from %2 to %3")
@@ -154,7 +155,7 @@ public:
             );
             return 0;
         }
-        return qint64(number);
+        return static_cast<qint64>(number);
     }
 
     qint64 time(const QString& key) { return integer(key, 0, kMaxSafeInteger); }
@@ -359,7 +360,7 @@ std::vector<Track> ReadTracks(Reader& reader, const QString& key, qsizetype maxi
 }
 
 int ReadMaxPending(Reader& reader) {
-    return int(reader.integer(
+    return static_cast<int>(reader.integer(
         QStringLiteral("maxPendingPerGuest"), kMinPendingPerGuest, kMaxPendingPerGuest
     ));
 }
@@ -485,7 +486,8 @@ Room ReadRoom(Reader reader) {
              {"qiyaa", ParticipantKind::Qiyaa}}
         );
         participant.online = item.boolean(QStringLiteral("online"));
-        participant.pending = int(item.integer(QStringLiteral("pending"), 0, kMaxQueue));
+        participant.pending =
+            static_cast<int>(item.integer(QStringLiteral("pending"), 0, kMaxQueue));
         room.participants.push_back(participant);
     }
 
@@ -535,7 +537,8 @@ Room ReadRoom(Reader reader) {
             == room.fallback.seeds.size(),
         QStringLiteral("seeds repeat")
     );
-    room.fallback.seedsVersion = int(fallback.integer(QStringLiteral("seedsVersion"), 0, INT_MAX));
+    room.fallback.seedsVersion =
+        static_cast<int>(fallback.integer(QStringLiteral("seedsVersion"), 0, INT_MAX));
     return room;
 }
 
@@ -544,7 +547,7 @@ ReadServer(const QString& type, const QJsonObject& json, QString* problem) {
     Reader reader(json, type, problem);
     if (type == QLatin1String("welcome")) {
         Welcome message;
-        message.protocol = int(reader.integer(QStringLiteral("protocol"), 1, INT_MAX));
+        message.protocol = static_cast<int>(reader.integer(QStringLiteral("protocol"), 1, INT_MAX));
         message.serverTime = reader.time(QStringLiteral("serverTime"));
         return message;
     }
@@ -559,7 +562,7 @@ ReadServer(const QString& type, const QJsonObject& json, QString* problem) {
         );
         if (reader.has(QStringLiteral("serverProtocol"))) {
             message.serverProtocol =
-                int(reader.integer(QStringLiteral("serverProtocol"), 1, INT_MAX));
+                static_cast<int>(reader.integer(QStringLiteral("serverProtocol"), 1, INT_MAX));
         }
         if (reader.ok() && !IsKnownReason(message.reason)) {
             *problem = QStringLiteral("rejected: unknown reason ") + message.reason;
@@ -672,7 +675,7 @@ ReadClient(const QString& type, const QJsonObject& json, QString* problem) {
     };
     if (type == QLatin1String("hello")) {
         Hello message;
-        message.protocol = int(reader.integer(QStringLiteral("protocol"), 1, INT_MAX));
+        message.protocol = static_cast<int>(reader.integer(QStringLiteral("protocol"), 1, INT_MAX));
         message.app = reader.choice<App>(
             QStringLiteral("app"),
             {{"desktop", App::Desktop}, {"android", App::Android}, {"web", App::Web}}
@@ -918,7 +921,7 @@ QJsonObject TrackJson(const Track& track) {
         {QStringLiteral("id"), track.id},
         {QStringLiteral("title"), track.title},
         {QStringLiteral("artists"), QJsonArray::fromStringList(track.artists)},
-        {QStringLiteral("durationMs"), double(track.durationMs)},
+        {QStringLiteral("durationMs"), static_cast<double>(track.durationMs)},
     };
     if (!track.albumId.isEmpty()) {
         json.insert(QStringLiteral("albumId"), track.albumId);
@@ -1000,7 +1003,7 @@ QJsonObject Body(const Resume& message) {
 QJsonObject Body(const Playing& message) {
     QJsonObject json{
         {QStringLiteral("source"), ToString(message.source)},
-        {QStringLiteral("positionMs"), double(message.positionMs)},
+        {QStringLiteral("positionMs"), static_cast<double>(message.positionMs)},
         {QStringLiteral("paused"), message.paused},
     };
     if (!message.itemId.isEmpty()) {

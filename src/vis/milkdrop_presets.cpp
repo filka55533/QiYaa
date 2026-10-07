@@ -76,7 +76,7 @@ int MilkdropPresets::random(int current) const {
     }
     int index;
     do {
-        index = int(QRandomGenerator::global()->bounded(size()));
+        index = static_cast<int>(QRandomGenerator::global()->bounded(size()));
     } while (index == current);
     return index;
 }

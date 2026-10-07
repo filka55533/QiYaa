@@ -291,7 +291,8 @@ default offscreen screen, where the scale tests skip themselves).
   result of `Yandex::SaveToken` is ignored.
 - Settings values are converted with `QVariant::toInt`, `toDouble`, `toBool`, `toPoint`, `toSize`.
   A key that is present but malformed does not fall back to the default (a number becomes 0). Only
-  `vis/mode` is clamped here. Volume, balance, scale, resize steps and Milkdrop seconds are clamped
+  `vis/mode` is clamped here before `static_cast<Ui::MainWindow::VisMode>`; saving uses
+  `static_cast<int>`. Volume, balance, scale, resize steps and Milkdrop seconds are clamped
   by the windows. Equalizer values are clamped to ±12 dB by the engine only, so the equalizer
   window draws an out-of-range value as stored.
 - A `skin` setting that fails to load is not cleared: the warning repeats at every start until

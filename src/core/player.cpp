@@ -182,14 +182,14 @@ void Player::insertTracks(int index, const QList<Yandex::Track>& tracks) {
     if (added.isEmpty()) {
         return;
     }
-    const int at = std::clamp(index, 0, int(queuedTracks.size()));
+    const int at = std::clamp(index, 0, static_cast<int>(queuedTracks.size()));
     for (qsizetype i = 0; i < added.size(); ++i) {
         queuedTracks.insert(at + i, added[i]);
     }
     if (playingIndex < 0) {
         playingIndex = 0;
     } else if (at <= playingIndex) {
-        playingIndex += int(added.size());
+        playingIndex += static_cast<int>(added.size());
     }
     resetNavigator();
     Q_EMIT playlistChanged();
@@ -232,7 +232,7 @@ void Player::removeTracks(QList<int> indices) {
     }
     if (removedCurrent) {
         stop();
-        playingIndex = std::min<int>(playingIndex, int(queuedTracks.size()) - 1);
+        playingIndex = std::min<int>(playingIndex, static_cast<int>(queuedTracks.size()) - 1);
         Q_EMIT currentTrackChanged();
     }
     if (queuedTracks.isEmpty()) {
@@ -255,7 +255,7 @@ const Yandex::Track* Player::currentTrack() const {
 
 double Player::durationSeconds() const {
     const auto* track = currentTrack();
-    return track ? double(track->durationMs) / 1000.0 : 0.0;
+    return track ? static_cast<double>(track->durationMs) / 1000.0 : 0.0;
 }
 
 void Player::play() {
@@ -355,7 +355,7 @@ void Player::resetNavigator() {
     navigator = MakeTrackNavigator(
         shuffleActive() ? std::optional(preferredShuffleAlgorithm) : std::nullopt
     );
-    navigator->reset(int(queuedTracks.size()), playingIndex);
+    navigator->reset(static_cast<int>(queuedTracks.size()), playingIndex);
 }
 
 int Player::pickNext() const {
@@ -601,7 +601,7 @@ void Player::downloadFinished(TStreamId stream, const Yandex::RequestError& erro
 
 void Player::handleFailure(FailureKind kind, const QString& text) {
     const FailureAction action =
-        DecideOnFailure(kind, failuresInRow, pickNext() >= 0, bool(loadMore));
+        DecideOnFailure(kind, failuresInRow, pickNext() >= 0, static_cast<bool>(loadMore));
     switch (action) {
         case FailureAction::WaitForNetwork: return waitForNetwork();
         case FailureAction::Next:  // ERR-04; in a wave at its end next() waits for more (ERR-07)

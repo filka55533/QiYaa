@@ -67,7 +67,7 @@ QString BandName(int band) {
 
 // Port of webamp's spline.js (itself adapted from morganherlocker/cubic-spline, MIT).
 QList<double> NaturalSpline(const QList<double>& xs, const QList<double>& ys) {
-    const int n = int(xs.size()) - 1;
+    const int n = static_cast<int>(xs.size()) - 1;
     QList<double> a(n + 1), b(n + 1), c(n + 1), d(n + 1), k(n + 1);
     for (int i = 0; i <= n; ++i) {
         if (i == 0) {
@@ -100,7 +100,7 @@ QList<double> NaturalSpline(const QList<double>& xs, const QList<double>& ys) {
 
     QList<double> curve;
     int i = 1;
-    for (int x = 0; x <= int(xs[n]); ++x) {
+    for (int x = 0; x <= static_cast<int>(xs[n]); ++x) {
         while (i < n && xs[i] < x) {
             ++i;
         }
@@ -146,14 +146,15 @@ QList<double> EqualizerWindow::GraphCurve(const Audio::EqSettings& settings) {
 }
 
 void EqualizerWindow::drawSlider(QPainter& painter, QPoint at, double db, bool active) const {
-    const int frame = int(std::lround((db + Audio::kEqMaxDb) / (2 * Audio::kEqMaxDb) * 27));
+    const int frame =
+        static_cast<int>(std::lround((db + Audio::kEqMaxDb) / (2 * Audio::kEqMaxDb) * 27));
     const QRect source(
         Skins::EqualizerSprites::kSliderFrames.x() + (frame % 14) * 15,
         Skins::EqualizerSprites::kSliderFrames.y() + (frame / 14) * 65,
         Skins::EqualizerSprites::kSliderSize.width(), Skins::EqualizerSprites::kSliderSize.height()
     );
     skin().draw(painter, TSheet::EqMain, source, at);
-    const int thumbY = int(std::lround(
+    const int thumbY = static_cast<int>(std::lround(
         (1.0 - (db + Audio::kEqMaxDb) / (2 * Audio::kEqMaxDb))
         * Skins::EqualizerSprites::kSliderTravel
     ));
@@ -169,14 +170,14 @@ void EqualizerWindow::drawGraph(QPainter& painter) const {
     skin().draw(painter, TSheet::EqMain, Skins::EqualizerSprites::kGraphBackground, origin);
     skin().draw(
         painter, TSheet::EqMain, Skins::EqualizerSprites::kPreampLine,
-        origin + QPoint(0, int(std::lround(DbToGraphY(equalizerSettings.preampDb))))
+        origin + QPoint(0, static_cast<int>(std::lround(DbToGraphY(equalizerSettings.preampDb))))
     );
 
     const QImage& sheet = skin().sheet(TSheet::EqMain);
     const QList<double> ys = GraphCurve(equalizerSettings);
-    int lastY = int(std::lround(ys.first()));
+    int lastY = static_cast<int>(std::lround(ys.first()));
     for (int x = 0; x < ys.size(); ++x) {
-        const int y = std::clamp(int(std::lround(ys[x])), 0, kGraphHeight - 1);
+        const int y = std::clamp(static_cast<int>(std::lround(ys[x])), 0, kGraphHeight - 1);
         const int top = std::min(y, lastY), bottom = std::max(y, lastY);
         for (int row = top; row <= bottom; ++row) {
             const QColor color = sheet.isNull()
@@ -218,7 +219,7 @@ void EqualizerWindow::paintShaded(QPainter& painter) {
     const int volumeThumb = std::clamp(volumePercent * 3 / 101, 0, 2);
     const int volumeX =
         Skins::EqualizerShadeSprites::kVolume.x()
-        + int(
+        + static_cast<int>(
             std::lround(volumePercent / 100.0 * (Skins::EqualizerShadeSprites::kVolume.width() - 3))
         );
     activeSkin.draw(
@@ -227,7 +228,7 @@ void EqualizerWindow::paintShaded(QPainter& painter) {
     );
     const int balanceThumb = std::clamp((balancePercent + 100) * 3 / 201, 0, 2);
     const int balanceX = Skins::EqualizerShadeSprites::kBalance.x()
-        + int(std::lround(
+        + static_cast<int>(std::lround(
             (balancePercent + 100) / 200.0 * (Skins::EqualizerShadeSprites::kBalance.width() - 3)
         ));
     activeSkin.draw(
@@ -384,9 +385,9 @@ void EqualizerWindow::setFromMouse(const EqualizerControl& control, QPoint point
         const double fraction =
             std::clamp((point.x() - rect.x() - 1.5) / (rect.width() - 3), 0.0, 1.0);
         if (control.kind == TControl::ShadeVolume) {
-            Q_EMIT volumeRequested(int(std::lround(fraction * 100)));
+            Q_EMIT volumeRequested(static_cast<int>(std::lround(fraction * 100)));
         } else {
-            Q_EMIT balanceRequested(int(std::lround(fraction * 200 - 100)));
+            Q_EMIT balanceRequested(static_cast<int>(std::lround(fraction * 200 - 100)));
         }
         return;
     }
@@ -396,7 +397,8 @@ void EqualizerWindow::setFromMouse(const EqualizerControl& control, QPoint point
     }
     const QRect rect = SliderRect(control);
     const double top = std::clamp(
-        double(point.y() - rect.y()) - 5.5, 0.0, double(Skins::EqualizerSprites::kSliderTravel)
+        static_cast<double>(point.y() - rect.y()) - 5.5, 0.0,
+        static_cast<double>(Skins::EqualizerSprites::kSliderTravel)
     );
     double db =
         Audio::kEqMaxDb - top / Skins::EqualizerSprites::kSliderTravel * 2 * Audio::kEqMaxDb;

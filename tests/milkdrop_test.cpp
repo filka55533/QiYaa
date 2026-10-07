@@ -246,7 +246,7 @@ private Q_SLOTS:
                     ++samples;
                 }
             }
-            colourCount = int(colours.size());
+            colourCount = static_cast<int>(colours.size());
             if (colourCount > 50 && litSamples > samples / 2) {
                 break;
             }

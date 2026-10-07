@@ -276,7 +276,7 @@ The name is decoded as UTF-8. Directory entries are skipped.
 | `kMaxArchiveBytes` | 64 MiB (67'108'864) | file size, in `LoadFile` only | throws |
 | `kMaxEntries` | 4096 | entries in the central directory, directories included | throws |
 | `kMaxEntryBytes` | 32 MiB | declared uncompressed size of one entry | entry skipped |
-| `kMaxTotalBytes` | 64 MiB | running sum of the declared sizes of the entries taken so far | entry skipped |
+| `kMaxTotalBytes` | 64 MiB | running sum of declared sizes converted with `static_cast<qint64>` after the per-entry limit check | entry skipped |
 
 The per-entry checks run before the entry is extracted. miniz then allocates the declared size and
 fails the entry if the data does not match that size or its CRC. An entry that fails to extract

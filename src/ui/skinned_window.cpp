@@ -147,7 +147,7 @@ void SkinnedWindow::resizeKeepingStack(QSize newSkinSize) {
     int self = -1;
     for (SkinnedWindow* window : WindowRegistry()) {
         if (window == this) {
-            self = int(all.size());
+            self = static_cast<int>(all.size());
         }
         all << window;
         rects << window->frameGeometry();
@@ -196,7 +196,7 @@ QList<SkinnedWindow*> SkinnedWindow::dockedWindows() const {
             continue;
         }
         if (window == this) {
-            self = int(visible.size());
+            self = static_cast<int>(visible.size());
         }
         visible << window;
         rects << window->frameGeometry();
@@ -210,7 +210,8 @@ QList<SkinnedWindow*> SkinnedWindow::dockedWindows() const {
 
 QPoint SkinnedWindow::toSkin(QPointF widgetPos) const {
     return QPoint(
-        int(std::floor(widgetPos.x() / scaleFactor)), int(std::floor(widgetPos.y() / scaleFactor))
+        static_cast<int>(std::floor(widgetPos.x() / scaleFactor)),
+        static_cast<int>(std::floor(widgetPos.y() / scaleFactor))
     );
 }
 
@@ -253,7 +254,7 @@ void SkinnedWindow::paintEvent(QPaintEvent*) {
         paintSkin(painter);
         return;
     }
-    const int bufferScale = int(std::ceil(scaleFactor * devicePixelRatioF() - 1e-6));
+    const int bufferScale = static_cast<int>(std::ceil(scaleFactor * devicePixelRatioF() - 1e-6));
     const QSize bufferSize = skinPixelSize * bufferScale;
     if (buffer.size() != bufferSize) {
         buffer = QImage(bufferSize, QImage::Format_ARGB32_Premultiplied);

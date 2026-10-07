@@ -32,7 +32,8 @@ EqualizerDsp::ComputeCoefficients(const EqSettings& settings, double sampleRate)
     Coefficients coefficients;
     coefficients.enabled = settings.enabled;
     coefficients.preamp =
-        float(std::pow(10.0, std::clamp(settings.preampDb, -kEqMaxDb, kEqMaxDb) / 20.0));
+        static_cast<float>(std::pow(10.0, std::clamp(settings.preampDb, -kEqMaxDb, kEqMaxDb) / 20.0)
+        );
     for (int i = 0; i < kEqBands; ++i) {
         Biquad& filter = coefficients.bands[i];
         const double db = std::clamp(settings.bandsDb[i], -kEqMaxDb, kEqMaxDb);
@@ -46,11 +47,11 @@ EqualizerDsp::ComputeCoefficients(const EqSettings& settings, double sampleRate)
         const double alpha = std::sin(w0) / (2.0 * kQ);
         const double cw = std::cos(w0);
         const double a0 = 1.0 + alpha / A;
-        filter.b0 = float((1.0 + alpha * A) / a0);
-        filter.b1 = float((-2.0 * cw) / a0);
-        filter.b2 = float((1.0 - alpha * A) / a0);
-        filter.a1 = float((-2.0 * cw) / a0);
-        filter.a2 = float((1.0 - alpha / A) / a0);
+        filter.b0 = static_cast<float>((1.0 + alpha * A) / a0);
+        filter.b1 = static_cast<float>((-2.0 * cw) / a0);
+        filter.b2 = static_cast<float>((1.0 - alpha * A) / a0);
+        filter.a1 = static_cast<float>((-2.0 * cw) / a0);
+        filter.a2 = static_cast<float>((1.0 - alpha / A) / a0);
         filter.identity = false;
     }
     return coefficients;
@@ -118,8 +119,9 @@ double EqualizerDsp::ResponseDb(const EqSettings& settings, double hz, double sa
         if (filter.identity) {
             continue;
         }
-        h *= (double(filter.b0) + double(filter.b1) * z + double(filter.b2) * z * z)
-            / (1.0 + double(filter.a1) * z + double(filter.a2) * z * z);
+        h *= (static_cast<double>(filter.b0) + static_cast<double>(filter.b1) * z
+              + static_cast<double>(filter.b2) * z * z)
+            / (1.0 + static_cast<double>(filter.a1) * z + static_cast<double>(filter.a2) * z * z);
     }
     return 20.0 * std::log10(std::abs(h));
 }

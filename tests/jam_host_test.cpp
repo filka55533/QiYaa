@@ -94,7 +94,7 @@ QJsonObject Item(
         {QStringLiteral("itemId"), itemId},
         {QStringLiteral("track"), TrackJson(trackId)},
         {QStringLiteral("addedBy"), addedBy},
-        {QStringLiteral("addedAt"), qint64(1'790'730'000'000)},
+        {QStringLiteral("addedAt"), static_cast<qint64>(1'790'730'000'000)},
         {QStringLiteral("pinned"), pinned}
     };
 }
@@ -220,7 +220,9 @@ private:
         }
 
         bool waitSent(qsizetype count) {
-            return QTest::qWaitFor([&] { return qsizetype(sent().size()) >= count; }, 5000);
+            return QTest::qWaitFor(
+                [&] { return static_cast<qsizetype>(sent().size()) >= count; }, 5000
+            );
         }
 
         void receive(const QByteArray& message) {
@@ -320,7 +322,7 @@ private Q_SLOTS:
         QCOMPARE(Ids(stack.player), QStringList{QStringLiteral("11")});
         stack.state(6, {Item("i1", "11"), Item("i2", "22")});
         QTRY_COMPARE(Ids(stack.player), (QStringList{"11", "22"}));
-        QCOMPARE(stack.host.room()->queue.size(), size_t(2));
+        QCOMPARE(stack.host.room()->queue.size(), static_cast<size_t>(2));
 
         // A new connection takes its first state whatever the version.
         stack.server.last().close();
@@ -503,7 +505,7 @@ private Q_SLOTS:
              {QStringLiteral("requestId"), QStringLiteral("q2")},
              {QStringLiteral("text"), QStringLiteral("кино")}}
         ));
-        QTRY_COMPARE(OfType<Jam::SearchResult>(stack.sent()).size(), size_t(2));
+        QTRY_COMPARE(OfType<Jam::SearchResult>(stack.sent()).size(), static_cast<size_t>(2));
         QCOMPARE(
             OfType<Jam::SearchResult>(stack.sent()).back(),
             (Jam::SearchResult{"q2", std::nullopt, Jam::SearchError::Failed})
@@ -515,7 +517,7 @@ private Q_SLOTS:
              {QStringLiteral("requestId"), QStringLiteral("q3")},
              {QStringLiteral("text"), QStringLiteral("кино")}}
         ));
-        QTRY_COMPARE(OfType<Jam::SearchResult>(stack.sent()).size(), size_t(3));
+        QTRY_COMPARE(OfType<Jam::SearchResult>(stack.sent()).size(), static_cast<size_t>(3));
         QCOMPARE(
             OfType<Jam::SearchResult>(stack.sent()).back(),
             (Jam::SearchResult{"q3", std::nullopt, Jam::SearchError::Unauthorized})
@@ -557,7 +559,7 @@ private Q_SLOTS:
              {QStringLiteral("requestId"), QStringLiteral("v2")},
              {QStringLiteral("trackIds"), QJsonArray{QStringLiteral("11"), QStringLiteral("22")}}}
         ));
-        QTRY_COMPARE(OfType<Jam::ValidateResult>(stack.sent()).size(), size_t(2));
+        QTRY_COMPARE(OfType<Jam::ValidateResult>(stack.sent()).size(), static_cast<size_t>(2));
         QCOMPARE(
             OfType<Jam::ValidateResult>(stack.sent()).back(),
             (Jam::ValidateResult{
@@ -630,15 +632,15 @@ private Q_SLOTS:
         next.id = QStringLiteral("55");
         next.title = QStringLiteral("E");
         QVERIFY(stack.host.playNext(next));
-        QTRY_COMPARE(OfType<Jam::Add>(stack.sent()).size(), size_t(2));
+        QTRY_COMPARE(OfType<Jam::Add>(stack.sent()).size(), static_cast<size_t>(2));
         QVERIFY(OfType<Jam::Pin>(stack.sent()).empty());
         stack.state(1, {Item("i1", "11"), Item("i2", "44", kHostId), Item("i3", "55", kHostId)});
         QTRY_VERIFY(!OfType<Jam::Pin>(stack.sent()).empty());
         QCOMPARE(OfType<Jam::Pin>(stack.sent()).back(), (Jam::Pin{"r4", "i3"}));
         stack.state(2, {Item("i1", "11"), Item("i2", "44", kHostId), Item("i3", "55", kHostId)});
-        QCOMPARE(OfType<Jam::Pin>(stack.sent()).size(), size_t(1));
+        QCOMPARE(OfType<Jam::Pin>(stack.sent()).size(), static_cast<size_t>(1));
         QVERIFY(stack.host.playNext(track));
-        QTRY_COMPARE(OfType<Jam::Pin>(stack.sent()).size(), size_t(2));
+        QTRY_COMPARE(OfType<Jam::Pin>(stack.sent()).size(), static_cast<size_t>(2));
         QCOMPARE(OfType<Jam::Pin>(stack.sent()).back(), (Jam::Pin{"r5", "i2"}));
         QVERIFY(stack.host.remove(QStringLiteral("i1")));
         QVERIFY(stack.host.kick(kGuestId));
@@ -663,25 +665,25 @@ private Q_SLOTS:
         playback.nextLink = next;
         const auto lastPlaying = [&] { return OfType<Jam::Playing>(stack.sent()).back(); };
         Q_EMIT stack.jam.playback(playback);
-        QTRY_COMPARE(OfType<Jam::Playing>(stack.sent()).size(), size_t(2));
+        QTRY_COMPARE(OfType<Jam::Playing>(stack.sent()).size(), static_cast<size_t>(2));
         QCOMPARE(lastPlaying().listenUrl, QString());
         QCOMPARE(lastPlaying().listenNextUrl, QString());
         stack.share = true;
         Q_EMIT stack.jam.playback(playback);
-        QTRY_COMPARE(OfType<Jam::Playing>(stack.sent()).size(), size_t(3));
+        QTRY_COMPARE(OfType<Jam::Playing>(stack.sent()).size(), static_cast<size_t>(3));
         QCOMPARE(lastPlaying().listenUrl, file.toString());
         QCOMPARE(lastPlaying().listenNextUrl, next.toString());
         playback.link = QUrl(QStringLiteral("http://127.0.0.1:8080/get-mp3/a/b/t1"));
         playback.nextLink = QUrl();
         Q_EMIT stack.jam.playback(playback);  // not Yandex's: the server would refuse it
-        QTRY_COMPARE(OfType<Jam::Playing>(stack.sent()).size(), size_t(4));
+        QTRY_COMPARE(OfType<Jam::Playing>(stack.sent()).size(), static_cast<size_t>(4));
         QCOMPARE(lastPlaying().listenUrl, QString());
         QCOMPARE(lastPlaying().listenNextUrl, QString());
         QCOMPARE(lastPlaying().itemId, QStringLiteral("i1"));
         playback = Core::JamPlayback{};  // idle: never a link
         playback.link = file;
         Q_EMIT stack.jam.playback(playback);
-        QTRY_COMPARE(OfType<Jam::Playing>(stack.sent()).size(), size_t(5));
+        QTRY_COMPARE(OfType<Jam::Playing>(stack.sent()).size(), static_cast<size_t>(5));
         QCOMPARE(lastPlaying().source, Jam::Source::Idle);
         QCOMPARE(lastPlaying().listenUrl, QString());
     }

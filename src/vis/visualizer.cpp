@@ -59,14 +59,14 @@ public:
         const int areaHeight = area.height();
         for (int bar = 0; bar < kBars; ++bar) {
             const int x = area.x() + bar * 4;
-            const int barHeight = int(std::ceil(bars[bar] * areaHeight));
+            const int barHeight = static_cast<int>(std::ceil(bars[bar] * areaHeight));
             for (int i = 0; i < barHeight; ++i) {
                 const int colorIndex = 2 + (areaHeight - 1 - i) * 16 / areaHeight;
                 painter.fillRect(
                     x, area.y() + areaHeight - 1 - i, 3, 1, VisColor(skin, colorIndex)
                 );
             }
-            const int peakHeight = int(std::ceil(peaks[bar] * areaHeight));
+            const int peakHeight = static_cast<int>(std::ceil(peaks[bar] * areaHeight));
             if (peakHeight > 0) {
                 painter.fillRect(x, area.y() + areaHeight - peakHeight, 3, 1, VisColor(skin, 23));
             }
@@ -87,14 +87,14 @@ public:
     void reset() override { rows.fill(-1); }
 
     void update(const VisFrame& frame) override {
-        const int sampleCount = int(frame.left.size());
+        const int sampleCount = static_cast<int>(frame.left.size());
         // Winamp shows ~576 samples across the 75 px area.
         const int shownSamples = std::min(sampleCount, 576);
         const int start = sampleCount - shownSamples;
         for (int x = 0; x < kWidth; ++x) {
             const int sample = start + x * shownSamples / kWidth;
             const float mono = 0.5f * (frame.left[sample] + frame.right[sample]);
-            rows[x] = std::clamp(int(std::lround(7.5f - mono * 8.0f)), 0, 15);
+            rows[x] = std::clamp(static_cast<int>(std::lround(7.5f - mono * 8.0f)), 0, 15);
         }
     }
 
@@ -107,7 +107,7 @@ public:
             const int y = rows[x];
             const int top = std::min(previousY, y), bottom = std::max(previousY, y);
             for (int row = top; row <= bottom; ++row) {
-                const int distance = int(std::abs(row - 7.5f));
+                const int distance = static_cast<int>(std::abs(row - 7.5f));
                 painter.fillRect(
                     area.x() + x, area.y() + row, 1, 1,
                     VisColor(skin, 18 + std::min(4, distance / 2))
@@ -143,7 +143,7 @@ Analyzer::Analyzer(int fftSize)
 const std::vector<float>& Analyzer::analyze(std::span<const float> mono) {
     const int n = fftLength;
     for (int i = 0; i < n; ++i) {
-        real[i] = i < int(mono.size()) ? mono[i] * windowFunction[i] : 0.0f;
+        real[i] = i < static_cast<int>(mono.size()) ? mono[i] * windowFunction[i] : 0.0f;
         imaginary[i] = 0.0f;
     }
     for (int i = 1, j = 0; i < n; ++i) {
@@ -188,15 +188,19 @@ const std::vector<float>& Analyzer::analyze(std::span<const float> mono) {
 
 std::array<SpectrumBand, kSpectrumBars> SpectrumBands(int sampleRate, int fftSize) {
     const int binCount = fftSize / 2 + 1;
-    const double binHz = double(sampleRate) / fftSize;
+    const double binHz = static_cast<double>(sampleRate) / fftSize;
     const double lowestHz = 60.0, highestHz = std::min(16'000.0, sampleRate / 2.0);
     std::array<SpectrumBand, kSpectrumBars> bands{};
     for (int bar = 0; bar < kSpectrumBars; ++bar) {
         SpectrumBand& band = bands[bar];
-        band.lowHz = lowestHz * std::pow(highestHz / lowestHz, double(bar) / kSpectrumBars);
-        band.highHz = lowestHz * std::pow(highestHz / lowestHz, double(bar + 1) / kSpectrumBars);
-        band.firstBin = std::clamp(int(band.lowHz / binHz), 1, binCount - 1);
-        band.endBin = std::clamp(int(std::ceil(band.highHz / binHz)), band.firstBin + 1, binCount);
+        band.lowHz =
+            lowestHz * std::pow(highestHz / lowestHz, static_cast<double>(bar) / kSpectrumBars);
+        band.highHz =
+            lowestHz * std::pow(highestHz / lowestHz, static_cast<double>(bar + 1) / kSpectrumBars);
+        band.firstBin = std::clamp(static_cast<int>(band.lowHz / binHz), 1, binCount - 1);
+        band.endBin = std::clamp(
+            static_cast<int>(std::ceil(band.highHz / binHz)), band.firstBin + 1, binCount
+        );
     }
     return bands;
 }
@@ -208,7 +212,7 @@ SpectrumLevels(std::span<const float> spectrumDb, int sampleRate, int fftSize) {
     const std::array<SpectrumBand, kSpectrumBars> bands = SpectrumBands(sampleRate, fftSize);
     for (int bar = 0; bar < kSpectrumBars; ++bar) {
         float peakDb = kMinDb;
-        const int endBin = std::min(bands[bar].endBin, int(spectrumDb.size()));
+        const int endBin = std::min(bands[bar].endBin, static_cast<int>(spectrumDb.size()));
         for (int i = bands[bar].firstBin; i < endBin; ++i) {
             peakDb = std::max(peakDb, spectrumDb[i]);
         }

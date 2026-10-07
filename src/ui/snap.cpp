@@ -203,7 +203,7 @@ QList<int> StackBelow(int self, const QList<QRect>& rects, int dy, const QList<b
         return BottomEdge(upper) == TopEdge(lower) && LeftEdge(upper) < RightEdge(lower)
             && LeftEdge(lower) < RightEdge(upper);
     };
-    const int count = int(rects.size());
+    const int count = static_cast<int>(rects.size());
     QList<bool> blocked(count, false);
     for (;;) {
         QList<bool> moving(count, false);

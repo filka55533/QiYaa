@@ -86,8 +86,8 @@ Three coordinate spaces are in use:
 | widget | Qt logical pixel = skin × `scale()` | mouse events, `size()`, `update()` |
 | screen | Qt logical pixel of the virtual desktop | `pos()`, `frameGeometry()`, snapping, screen rects |
 
-`toSkin()` converts widget to skin (floor of widget / scale); the windows map back with
-`mapToGlobal(qRound(skin × scale()))` when they pop up a menu.
+`toSkin()` converts widget to skin with `static_cast<int>(floor(widget / scale))`; the windows
+map back with `mapToGlobal(qRound(skin × scale()))` when they pop up a menu.
 
 `src/app` creates one instance of each window, owns them, hands them one `const Skins::Skin*` (not
 owned; replaced through `setSkin`) and connects their signals. The windows never call each other:

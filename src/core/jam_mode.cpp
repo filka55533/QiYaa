@@ -240,7 +240,8 @@ void JamMode::reportPlayback() {
         report.track = *track;
         report.link = corePlayer->currentLink();
         report.nextLink = corePlayer->nextLink();
-        report.positionMs = stopped ? 0 : qint64(corePlayer->engine()->positionSeconds() * 1000);
+        report.positionMs =
+            stopped ? 0 : static_cast<qint64>(corePlayer->engine()->positionSeconds() * 1000);
         report.paused = state != Audio::AudioEngine::State::Playing;
     }
     Q_EMIT playback(report);

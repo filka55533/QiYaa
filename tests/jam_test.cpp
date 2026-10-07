@@ -270,7 +270,7 @@ void JamTest::endedStopsTheClientForGood() {
     QTRY_COMPARE(client.status(), Jam::Status::Online);
     server.send(Example(QStringLiteral("ended/expired")));
     QTRY_COMPARE(client.status(), Jam::Status::Stopped);
-    QCOMPARE(received.size(), size_t(1));
+    QCOMPARE(received.size(), static_cast<size_t>(1));
     QVERIFY(std::holds_alternative<Jam::Ended>(received.front()));
     QTest::qWait(300);
     QCOMPARE(server.count(), 1);
@@ -312,13 +312,13 @@ void JamTest::invalidMessagesAreSkippedAndUnknownReasonsArrive() {
     server.send(Example(QStringLiteral("state/invalid-host-secret")));
     server.send(Example(QStringLiteral("rejected/invalid-unknown-reason")));
     server.send(Example(QStringLiteral("state/host")));
-    QTRY_COMPARE(received.size(), size_t(2));
+    QTRY_COMPARE(received.size(), static_cast<size_t>(2));
     const auto* rejected = std::get_if<Jam::Rejected>(&received[0]);
     QVERIFY(rejected);
     QVERIFY(!Jam::IsKnownReason(rejected->reason));
     const auto* state = std::get_if<Jam::State>(&received[1]);
     QVERIFY(state);
-    QCOMPARE(state->room.queue.size(), size_t(3));
+    QCOMPARE(state->room.queue.size(), static_cast<size_t>(3));
     QCOMPARE(state->room.fallback.seedsVersion, 4);
 }
 

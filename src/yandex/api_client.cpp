@@ -60,7 +60,7 @@ ApiClient::ApiClient(QNetworkAccessManager* networkAccessManager, QObject* paren
 
 QString ApiClient::IdString(const QJsonValue& value) {
     if (value.isDouble()) {
-        return QString::number(qint64(value.toDouble()));
+        return QString::number(static_cast<qint64>(value.toDouble()));
     }
     return value.toString();
 }
@@ -252,7 +252,7 @@ Track ApiClient::ParseTrack(const QJsonValue& value) {
     if (track.coverUri.isEmpty()) {
         track.coverUri = object.value(QStringLiteral("ogImage")).toString();
     }
-    track.durationMs = qint64(object.value(QStringLiteral("durationMs")).toDouble());
+    track.durationMs = static_cast<qint64>(object.value(QStringLiteral("durationMs")).toDouble());
     track.available = object.value(QStringLiteral("available")).toBool(true);
     return track;
 }

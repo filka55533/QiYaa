@@ -199,9 +199,9 @@ private Q_SLOTS:
         QTest::addColumn<int>("language");
         QTest::addColumn<int>("count");
         QTest::addColumn<QString>("text");
-        const auto be = int(App::Language::Belarusian);
-        const auto ru = int(App::Language::Russian);
-        const auto en = int(App::Language::English);
+        const auto be = static_cast<int>(App::Language::Belarusian);
+        const auto ru = static_cast<int>(App::Language::Russian);
+        const auto en = static_cast<int>(App::Language::English);
         QTest::newRow("be 1") << be << 1 << QStringLiteral("Мне падабаецца: 1 трэк");
         QTest::newRow("be 3") << be << 3 << QStringLiteral("Мне падабаецца: 3 трэкі");
         QTest::newRow("be 5") << be << 5 << QStringLiteral("Мне падабаецца: 5 трэкаў");
@@ -217,7 +217,7 @@ private Q_SLOTS:
         QFETCH(int, count);
         QFETCH(QString, text);
         App::Translations translations;
-        QVERIFY(translations.apply(App::Language(language)));
+        QVERIFY(translations.apply(static_cast<App::Language>(language)));
         QCOMPARE(
             QCoreApplication::translate("Core::Sources", "Liked: %n track(s)", nullptr, count), text
         );

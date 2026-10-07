@@ -579,7 +579,7 @@ private Q_SLOTS:
         player.setQueue(
             tracks, "W", false, {},
             [&](Core::Player::TrackEvent event, const Yandex::Track& track, double) {
-                log << QStringLiteral("%1:%2").arg(int(event)).arg(track.id);
+                log << QStringLiteral("%1:%2").arg(static_cast<int>(event)).arg(track.id);
             }
         );
         player.playIndex(0);
@@ -640,7 +640,7 @@ private Q_SLOTS:
         playback.player.setQueue(
             NumberedTracks({11, 12, 13}), "A", false, {},
             [&](Core::Player::TrackEvent event, const Yandex::Track& track, double) {
-                log << QStringLiteral("%1:%2").arg(int(event)).arg(track.id);
+                log << QStringLiteral("%1:%2").arg(static_cast<int>(event)).arg(track.id);
             }
         );
         QSignalSpy advanced(&playback.engine, &Audio::AudioEngine::trackAdvanced);
@@ -851,7 +851,7 @@ private Q_SLOTS:
             QCOMPARE(player.currentTrack()->id, QStringLiteral("3"));
         }
         QSet<QString> visited;
-        const int size = int(player.playlist().size());
+        const int size = static_cast<int>(player.playlist().size());
         for (int count = 0; count < size; ++count) {
             const QString id = player.currentTrack()->id;
             QVERIFY(!visited.contains(id));
@@ -871,8 +871,9 @@ private Q_SLOTS:
 
     void shuffleToggleKeepsPlaybackAndGaplessAdvanceFollowsTheOrder_data() {
         QTest::addColumn<int>("algorithm");
-        QTest::newRow("without repeats") << int(Core::ShuffleAlgorithm::WithoutRepeats);
-        QTest::newRow("random") << int(Core::ShuffleAlgorithm::Random);
+        QTest::newRow("without repeats")
+            << static_cast<int>(Core::ShuffleAlgorithm::WithoutRepeats);
+        QTest::newRow("random") << static_cast<int>(Core::ShuffleAlgorithm::Random);
     }
 
     void shuffleToggleKeepsPlaybackAndGaplessAdvanceFollowsTheOrder(
@@ -883,7 +884,7 @@ private Q_SLOTS:
             QSKIP("no audio output");
         }
         auto& player = playback.player;
-        player.setShuffleAlgorithm(Core::ShuffleAlgorithm(algorithm));
+        player.setShuffleAlgorithm(static_cast<Core::ShuffleAlgorithm>(algorithm));
         player.setQueue(NumberedTracks({31, 32, 33}), "Plain", true);
         QVERIFY(QTest::qWaitFor([&] { return player.preloadedIndex() == 1; }, 5000));
         QVERIFY(player.seekTo(0.5));

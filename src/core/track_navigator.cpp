@@ -41,7 +41,7 @@ public:
         if (trackCount < 2) {
             return;
         }
-        nextIndex = int(QRandomGenerator::global()->bounded(trackCount - 1));
+        nextIndex = static_cast<int>(QRandomGenerator::global()->bounded(trackCount - 1));
         if (nextIndex >= currentIndex) {
             ++nextIndex;
         }
@@ -72,7 +72,7 @@ public:
         std::shuffle(order.begin() + 1, order.end(), *QRandomGenerator::global());
         position = 0;
     }
-    void select(int index) override { position = int(order.indexOf(index)); }
+    void select(int index) override { position = static_cast<int>(order.indexOf(index)); }
     int next(bool repeat) const override {
         if (order.isEmpty()) {
             return -1;

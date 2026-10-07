@@ -71,10 +71,10 @@ QByteArray EncodeName(const QString& name) {
     if (encoded.size() > kNameLength - 1) {
         encoded.truncate(kNameLength - 1);
         if (useUtf8) {  // don't cut a character in half
-            while (!encoded.isEmpty() && (quint8(encoded.back()) & 0xC0) == 0x80) {
+            while (!encoded.isEmpty() && (static_cast<quint8>(encoded.back()) & 0xC0) == 0x80) {
                 encoded.chop(1);
             }
-            if (!encoded.isEmpty() && quint8(encoded.back()) >= 0xC0) {
+            if (!encoded.isEmpty() && static_cast<quint8>(encoded.back()) >= 0xC0) {
                 encoded.chop(1);
             }
         }
@@ -98,7 +98,9 @@ QList<EqPreset> ParseEqf(const QByteArray& data) {
         EqPreset preset;
         preset.name = DecodeName(nulIndex >= 0 ? rawName.left(nulIndex) : rawName);
         offset += kNameLength;
-        auto valueAt = [&](int index) { return 64 - int(quint8(data[offset + index])); };
+        auto valueAt = [&](int index) {
+            return 64 - static_cast<int>(static_cast<quint8>(data[offset + index]));
+        };
         for (int band = 0; band < kEqBands; ++band) {
             preset.settings.bandsDb[band] = std::round(EqfToDb(valueAt(band)) * 10) / 10;
         }
@@ -118,16 +120,16 @@ QList<EqPreset> ParseEqf(const QByteArray& data) {
 
 QByteArray WriteEqf(const QList<EqPreset>& presets) {
     QByteArray data(kHeader);
-    data += char(26);
+    data += static_cast<char>(26);
     data += "!--";
     for (const EqPreset& preset : presets) {
         QByteArray name = EncodeName(preset.name);
         name.append(QByteArray(kNameLength - name.size(), '\0'));
         data += name;
         for (int band = 0; band < kEqBands; ++band) {
-            data += char(64 - DbToEqf(preset.settings.bandsDb[band]));
+            data += static_cast<char>(64 - DbToEqf(preset.settings.bandsDb[band]));
         }
-        data += char(64 - DbToEqf(preset.settings.preampDb));
+        data += static_cast<char>(64 - DbToEqf(preset.settings.preampDb));
     }
     return data;
 }
@@ -135,11 +137,11 @@ QByteArray WriteEqf(const QList<EqPreset>& presets) {
 // 33 is Winamp's centre notch (0 dB writes 33): exactly 0 dB, not the line's +0.19 dB.
 double EqfToDb(int value) {
     value = std::clamp(value, 1, 64);
-    return value == 33 ? 0.0 : (double(value) - 1.0) / 63.0 * 24.0 - 12.0;
+    return value == 33 ? 0.0 : (static_cast<double>(value) - 1.0) / 63.0 * 24.0 - 12.0;
 }
 
 int DbToEqf(double db) {
-    return std::clamp(int(std::lround((db + 12.0) / 24.0 * 63.0 + 1.0)), 1, 64);
+    return std::clamp(static_cast<int>(std::lround((db + 12.0) / 24.0 * 63.0 + 1.0)), 1, 64);
 }
 
 QList<EqPreset> BuiltinEqPresets() {

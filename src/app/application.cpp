@@ -310,7 +310,7 @@ Application::Application(const Options& options, QObject* parent)
 
     mainWindowInstance->setVolume(settings.value(QStringLiteral("volume"), 75).toInt());
     mainWindowInstance->setBalance(settings.value(QStringLiteral("balance"), 0).toInt());
-    mainWindowInstance->setVisMode(Ui::MainWindow::VisMode(
+    mainWindowInstance->setVisMode(static_cast<Ui::MainWindow::VisMode>(
         std::clamp(settings.value(QStringLiteral("vis/mode"), 0).toInt(), 0, 2)
     ));
     mainWindowInstance->setShowsRemainingTime(
@@ -982,7 +982,7 @@ void Application::quit() {
 void Application::saveState() {
     settings.setValue(QStringLiteral("volume"), mainWindowInstance->volume());
     settings.setValue(QStringLiteral("balance"), mainWindowInstance->balance());
-    settings.setValue(QStringLiteral("vis/mode"), int(mainWindowInstance->visMode()));
+    settings.setValue(QStringLiteral("vis/mode"), static_cast<int>(mainWindowInstance->visMode()));
     settings.setValue(QStringLiteral("time/remaining"), mainWindowInstance->showsRemainingTime());
     settings.setValue(QStringLiteral("equalizer/auto"), equalizerWindowInstance->autoOn());
     if (!Ui::SkinnedWindow::CanPositionWindows() || !mainWindowInstance->isVisible()

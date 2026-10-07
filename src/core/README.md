@@ -470,7 +470,8 @@ FailureAction DecideOnFailure(FailureKind kind, int failuresInRow, bool hasNext,
 - The poll timer calls `accumulatePlayedSeconds()` for its side effect; dropping the call loses
   the played time. A stall of the GUI thread longer than 1 s between two ticks also loses that
   stretch.
-- `durationSeconds()` is the metadata duration, not the decoded length. `seekTo` clamps to it.
+- `durationSeconds()` is `static_cast<double>(durationMs) / 1000.0`, using the metadata duration,
+  not the decoded length. `seekTo` clamps to it.
 - Removing a track before the current one changes `currentIndex()` without
   `currentTrackChanged`. The same is true when `appendTracks` moves the cursor from -1 to 0. UI
   that depends on the index must also listen to `playlistChanged`.

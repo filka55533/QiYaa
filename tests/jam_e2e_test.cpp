@@ -182,7 +182,7 @@ private Q_SLOTS:
         guest.send(Jam::Search{QStringLiteral("g2"), QStringLiteral("кино")});
         const std::optional<Jam::SearchResults> found = guest.waitFor<Jam::SearchResults>();
         QVERIFY(found);
-        QCOMPARE(found->tracks.size(), size_t(1));
+        QCOMPARE(found->tracks.size(), static_cast<size_t>(1));
         QCOMPARE(found->tracks.front().id, kTrack);
         QCOMPARE(
             yandex.last(QStringLiteral("/search"))->query.queryItemValue(QStringLiteral("type")),

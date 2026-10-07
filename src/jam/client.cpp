@@ -188,7 +188,7 @@ void Client::socketClosed(QWebSocket* closed) {
     }
     setStatus(Status::Offline);
     const auto delays = options.reconnectDelaysMs;
-    const int delayMs = delays[std::min<size_t>(size_t(attempt), delays.size() - 1)];
+    const int delayMs = delays[std::min<size_t>(static_cast<size_t>(attempt), delays.size() - 1)];
     ++attempt;
     retryTimer.start(delayMs);
 }

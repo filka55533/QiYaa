@@ -28,9 +28,9 @@ private:
             .arg(advancedCount)
             .arg(finishedCount)
             .arg(engine.positionSeconds(), 0, 'f', 2)
-            .arg(QLatin1String(
-                QMetaEnum::fromType<Audio::AudioEngine::State>().valueToKey(int(engine.state()))
-            ))
+            .arg(QLatin1String(QMetaEnum::fromType<Audio::AudioEngine::State>().valueToKey(
+                static_cast<int>(engine.state())
+            )))
             .arg(engine.currentStream())
             .arg(engine.queuedStream());
     }
@@ -203,7 +203,7 @@ private Q_SLOTS:
         QCOMPARE(finished.count(), 0);
         QVERIFY(states.isEmpty());
         QCOMPARE(engine.currentStream(), nextStream);
-        QCOMPARE(engine.queuedStream(), Audio::AudioEngine::TStreamId(0));
+        QCOMPARE(engine.queuedStream(), static_cast<Audio::AudioEngine::TStreamId>(0));
         QVERIFY2(
             engine.positionSeconds() < 0.3, qPrintable(QString::number(engine.positionSeconds()))
         );
@@ -258,7 +258,7 @@ private Q_SLOTS:
         QCOMPARE(engine.currentStream(), nextStream);
         pumpUntil([&] { return engine.state() == Audio::AudioEngine::State::Playing; }, 3000);
         QVERIFY(engine.positionSeconds() < 0.5);
-        QCOMPARE(engine.queuedStream(), Audio::AudioEngine::TStreamId(0));
+        QCOMPARE(engine.queuedStream(), static_cast<Audio::AudioEngine::TStreamId>(0));
         engine.stop();
     }
 
@@ -270,7 +270,7 @@ private Q_SLOTS:
         pumpUntil([&] { return finished.count() > 0 || advanced.count() > 0; }, 3000);
         QCOMPARE(finished.count(), 1);
         QCOMPARE(advanced.count(), 0);
-        QCOMPARE(engine.queuedStream(), Audio::AudioEngine::TStreamId(0));
+        QCOMPARE(engine.queuedStream(), static_cast<Audio::AudioEngine::TStreamId>(0));
         engine.stop();
     }
 

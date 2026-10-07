@@ -32,7 +32,7 @@ std::vector<float> StereoSine(double hz, double sampleRate, int frames, float am
     std::vector<float> samples(frames * 2);
     for (int i = 0; i < frames; ++i) {
         const float sample =
-            amplitude * float(std::sin(2 * std::numbers::pi * hz * i / sampleRate));
+            amplitude * static_cast<float>(std::sin(2 * std::numbers::pi * hz * i / sampleRate));
         samples[i * 2] = samples[i * 2 + 1] = sample;
     }
     return samples;
@@ -42,7 +42,7 @@ double Rms(const std::vector<float>& samples, int fromFrame) {
     double sum = 0;
     int frameCount = 0;
     for (size_t i = fromFrame * 2; i < samples.size(); i += 2, ++frameCount) {
-        sum += double(samples[i]) * samples[i];
+        sum += static_cast<double>(samples[i]) * samples[i];
     }
     return std::sqrt(sum / frameCount);
 }
@@ -58,7 +58,7 @@ template <typename Values>
 QJsonArray NumberArray(const Values& values) {
     QJsonArray array;
     for (const auto value : values) {
-        array.append(double(value));
+        array.append(static_cast<double>(value));
     }
     return array;
 }
@@ -199,7 +199,9 @@ QJsonObject MakeEqf() {
         parsedBytes.append(QJsonObject{
             {QStringLiteral("byte"), byte},
             {QStringLiteral("db"),
-             Audio::ParseEqf(EqfWithFirstBandByte(char(byte))).first().settings.bandsDb[0]}
+             Audio::ParseEqf(EqfWithFirstBandByte(static_cast<char>(byte)))
+                 .first()
+                 .settings.bandsDb[0]}
         });
     }
     return {
@@ -216,7 +218,8 @@ QJsonObject MakeEqf() {
 std::vector<float> MonoSine(double hz, double amplitude, int sampleRate, int count) {
     std::vector<float> samples(count);
     for (int i = 0; i < count; ++i) {
-        samples[i] = float(amplitude * std::sin(2 * std::numbers::pi * hz * i / sampleRate));
+        samples[i] =
+            static_cast<float>(amplitude * std::sin(2 * std::numbers::pi * hz * i / sampleRate));
     }
     return samples;
 }
@@ -347,7 +350,9 @@ private Q_SLOTS:
             QVERIFY2(problem.isEmpty(), qPrintable(problem));
             const std::vector<double> levels = Numbers(item["levels"]);
             for (int band = 0; band < Audio::kEqBands; ++band) {
-                QCOMPARE(Audio::EqfToDb(int(levels[band])), item["bandsDb"][band].toDouble());
+                QCOMPARE(
+                    Audio::EqfToDb(static_cast<int>(levels[band])), item["bandsDb"][band].toDouble()
+                );
             }
             QCOMPARE(Audio::EqfToDb(item["preampLevel"].toInt()), presets[i].settings.preampDb);
         }
@@ -375,8 +380,9 @@ private Q_SLOTS:
         }
         for (const QJsonValue& value : spec["parsedBytes"].toArray()) {
             const int byte = value["byte"].toInt();
-            const double db =
-                Audio::ParseEqf(EqfWithFirstBandByte(char(byte))).first().settings.bandsDb[0];
+            const double db = Audio::ParseEqf(EqfWithFirstBandByte(static_cast<char>(byte)))
+                                  .first()
+                                  .settings.bandsDb[0];
             QVERIFY2(
                 std::abs(db - value["db"].toDouble()) <= tolerance,
                 qPrintable(QStringLiteral("byte %1: %2").arg(byte).arg(db))
@@ -389,7 +395,7 @@ private Q_SLOTS:
         const double tolerance = spec["tolerance"]["level"].toDouble();
         QCOMPARE(spec["fftSize"].toInt(), kVectorFftSize);
         const QJsonObject bandsByRate = spec["bands"].toObject();
-        QCOMPARE(bandsByRate.size(), int(std::size(kVectorSampleRates)));
+        QCOMPARE(bandsByRate.size(), static_cast<int>(std::size(kVectorSampleRates)));
         for (auto it = bandsByRate.constBegin(); it != bandsByRate.constEnd(); ++it) {
             const auto bands = Vis::SpectrumBands(it.key().toInt(), kVectorFftSize);
             const QJsonArray expected = it.value().toArray();
@@ -519,7 +525,7 @@ private Q_SLOTS:
         QByteArray file("Winamp EQ library file v1.1\x1a!--");
         QByteArray name("max");
         name.append(QByteArray(257 - name.size(), '\0'));
-        file += name + QByteArray(10, char(0)) + QByteArray(1, char(63));
+        file += name + QByteArray(10, static_cast<char>(0)) + QByteArray(1, static_cast<char>(63));
         const QList<Audio::EqPreset> presets = Audio::ParseEqf(file);
         QCOMPARE(presets[0].settings.bandsDb[0], 12.0);
         QCOMPARE(presets[0].settings.preampDb, -12.0);
@@ -553,13 +559,14 @@ private Q_SLOTS:
         const double sampleRate = 44'100, hz = 1000;
         std::vector<float> mono(1024);
         for (int i = 0; i < 1024; ++i) {
-            mono[i] = float(std::sin(2 * std::numbers::pi * hz * i / sampleRate));
+            mono[i] = static_cast<float>(std::sin(2 * std::numbers::pi * hz * i / sampleRate));
         }
         const auto& spectrumDb = analyzer.analyze(mono);
-        QCOMPARE(int(spectrumDb.size()), 513);
-        const int peak =
-            int(std::max_element(spectrumDb.begin(), spectrumDb.end()) - spectrumDb.begin());
-        QCOMPARE(peak, int(std::lround(hz / (sampleRate / 1024))));
+        QCOMPARE(static_cast<int>(spectrumDb.size()), 513);
+        const int peak = static_cast<int>(
+            std::max_element(spectrumDb.begin(), spectrumDb.end()) - spectrumDb.begin()
+        );
+        QCOMPARE(peak, static_cast<int>(std::lround(hz / (sampleRate / 1024))));
         QVERIFY(std::abs(spectrumDb[peak]) < 1.5);  // full-scale sine ~ 0 dBFS
         QVERIFY(spectrumDb[400] < -50);
     }
@@ -570,7 +577,7 @@ private Q_SLOTS:
         std::vector<float> left(1024), right(1024), mono(1024);
         for (int i = 0; i < 1024; ++i) {
             left[i] = right[i] = mono[i] =
-                0.8f * float(std::sin(2 * std::numbers::pi * 200 * i / 44'100.0));
+                0.8f * static_cast<float>(std::sin(2 * std::numbers::pi * 200 * i / 44'100.0));
         }
         const auto& spectrumDb = analyzer.analyze(mono);
         Vis::VisFrame frame{left, right, spectrumDb, 44'100, 1024};
@@ -598,14 +605,14 @@ private Q_SLOTS:
         QByteArray name("Flat");
         name.append(QByteArray(257 - name.size(), '\0'));
         file += name;
-        file += QByteArray(10, char(31));  // Winamp's own midline.EQF: 64 - 31 = 33
-        file += char(255);  // garbage: must not reach the DSP as -85 dB
+        file += QByteArray(10, static_cast<char>(31));  // Winamp's own midline.EQF: 64 - 31 = 33
+        file += static_cast<char>(255);  // garbage: must not reach the DSP as -85 dB
         const QList<Audio::EqPreset> presets = Audio::ParseEqf(file);
         for (int band = 0; band < Audio::kEqBands; ++band) {
             QCOMPARE(presets[0].settings.bandsDb[band], 0.0);
         }
         QCOMPARE(presets[0].settings.preampDb, -12.0);
-        QCOMPARE(Audio::WriteEqf(presets).mid(31 + 257, 10), QByteArray(10, char(31)));
+        QCOMPARE(Audio::WriteEqf(presets).mid(31 + 257, 10), QByteArray(10, static_cast<char>(31)));
     }
 
     void eqfKeepsNonLatinNames() {

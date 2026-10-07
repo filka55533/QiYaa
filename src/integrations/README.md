@@ -191,7 +191,7 @@ the project's camelCase rule for methods. Their READ/WRITE accessors (`playbackS
 | `Shuffle` (rw) | `Player::shuffle()` / `Player::setShuffle()` |
 | `Rate`, `MinimumRate`, `MaximumRate` | `1.0`; writing `Rate` is ignored |
 | `Volume` (rw) | `Hooks::volume() / 100.0` (`1.0` without the hook). A write is clamped to 0..1, rounded to a percent and passed to `Hooks::setVolume` |
-| `Position` | engine position in µs |
+| `Position` | `static_cast<qlonglong>(positionSeconds() * 1e6)`, engine position in µs |
 | `Metadata` | see below |
 | `CanGoNext`, `CanGoPrevious`, `CanPlay`, `CanPause`, `CanControl` | always `true` |
 | `CanSeek` | `MediaControls::canSeek()` |

@@ -178,7 +178,8 @@ void MilkdropView::syncWindowSize() {
     }
     pixelSize = devicePixelSize;
     projectm_set_window_size(
-        projectM, size_t(devicePixelSize.width()), size_t(devicePixelSize.height())
+        projectM, static_cast<size_t>(devicePixelSize.width()),
+        static_cast<size_t>(devicePixelSize.height())
     );
 }
 

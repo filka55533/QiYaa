@@ -144,7 +144,8 @@ void Sources::playLikes(bool autoplay) {
         }
         guardedPlayer->setQueue(tracks, tr("Liked"), autoplay);
         ShowStatus(
-            guardedPlayer, tr("Liked: %n track(s)", nullptr, int(guardedPlayer->playlist().size()))
+            guardedPlayer,
+            tr("Liked: %n track(s)", nullptr, static_cast<int>(guardedPlayer->playlist().size()))
         );
     });
 }

@@ -171,8 +171,9 @@ its `trackFinished` slot). Nothing is reported between polls; how often `Player`
 
 ### Position, volume, balance
 
-`positionSeconds()` = max(0, `frameOffset` + `framesPlayed`) / device rate. `framesPlayed` counts
-the frames the callback took out of the ring since the last ring reset (start or seek);
+`positionSeconds()` converts max(0, `frameOffset` + `framesPlayed`) with `static_cast<double>`
+before dividing by the device rate. `framesPlayed` counts the frames the callback took out of
+the ring since the last ring reset (start or seek);
 `frameOffset` is the track position of `framesPlayed == 0`: 0 at the start, the target after a
 seek, −`boundaryFrame` after a gapless advance. The position stands still during a pause, an
 underrun and a pending seek.

@@ -121,8 +121,8 @@ Q_SIGNALS:
 - `path` is appended to the base URL (default `https://api.music.yandex.net`) as is. Headers,
   timeouts, body encodings and the envelope are in [API requests](#api-requests-and-the-envelope).
 - `ParseTrack` reads the fields listed under [Track objects](#track-objects). `IdString` turns a
-  JSON number into integer text (through `qint64`), returns a string as is, and anything else as
-  an empty string.
+  JSON number into integer text (through `static_cast<qint64>`), returns a string as is, and
+  anything else as an empty string.
 - `Track::coverUrl(size)` replaces `%%` with `<size>x<size>` and prepends `https://` unless the URI
   already starts with `http`. `webUrl()` is `https://music.yandex.ru/album/<albumId>/track/<id>`, or
   `https://music.yandex.ru/track/<id>` without an album. `displayTitle()` is the bare title when

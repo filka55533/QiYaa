@@ -216,6 +216,11 @@ Sort each group alphabetically. Include what you use, and prefer `<iosfwd>`
 and forward declarations in headers.
 
 **Types and APIs**
+
+- Use `static_cast<T>(value)` for explicit numeric, enum and compatible pointer conversions,
+  including conversions previously written as `int(value)` or `Enum(value)`. Use
+  `reinterpret_cast` for pointer reinterpretation and `const_cast` for cv-qualifier changes.
+  Functional notation remains appropriate for object construction.
 - Data is a plain `struct` with default member initializers. Configs, options,
   reports and results are all plain structs.
 - A function returns its result by value. Out-parameters are only for an

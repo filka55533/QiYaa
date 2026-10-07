@@ -91,7 +91,7 @@ index the skin does not have is drawn `Qt::green`.
 |---|---|
 | 0, 1 | not used here (background, grid dots) |
 | 2..17 | spectrum bars by row: `2 + rowFromTop * 16 / areaHeight`, so 2 at the top of the area, 17 at the bottom |
-| 18..21 | oscilloscope by distance from the centre line: `18 + min(4, int(abs(row - 7.5)) / 2)` |
+| 18..21 | oscilloscope by distance from the centre line: `18 + min(4, static_cast<int>(abs(row - 7.5)) / 2)` |
 | 22 | never reached: the largest distance on 16 rows is 7 |
 | 23 | spectrum peaks |
 

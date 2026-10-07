@@ -76,7 +76,7 @@ PlaylistWindow::PlaylistWindow(Core::Player* player, const Skins::Skin* skin, QW
         update();
     });
     connect(corePlayer, &Core::Player::playlistChanged, this, [this] {
-        const int trackCount = int(corePlayer->playlist().size());
+        const int trackCount = static_cast<int>(corePlayer->playlist().size());
         QSet<int> valid;
         for (int row : selectedRows) {
             if (row < trackCount) {
@@ -94,7 +94,7 @@ PlaylistWindow::PlaylistWindow(Core::Player* player, const Skins::Skin* skin, QW
         update();
     });
     connect(corePlayer, &Core::Player::positionTick, this, [this] {
-        const int second = int(corePlayer->engine()->positionSeconds());
+        const int second = static_cast<int>(corePlayer->engine()->positionSeconds());
         if (second == shownSecond) {
             return;
         }
@@ -138,7 +138,7 @@ int PlaylistWindow::visibleRows() const {
 }
 
 int PlaylistWindow::maxScroll() const {
-    return std::max(0, int(corePlayer->playlist().size()) - visibleRows());
+    return std::max(0, static_cast<int>(corePlayer->playlist().size()) - visibleRows());
 }
 
 void PlaylistWindow::setScrollOffset(int row) {
@@ -183,7 +183,9 @@ QRect PlaylistWindow::scrollHandleRect() const {
     const int travel =
         std::max(0, listArea.height() - Skins::PlaylistSprites::kScrollHandle.height());
     const int max = maxScroll();
-    const int y = listArea.y() + (max > 0 ? int(std::lround(double(scrollRow) / max * travel)) : 0);
+    const int y = listArea.y()
+        + (max > 0 ? static_cast<int>(std::lround(static_cast<double>(scrollRow) / max * travel))
+                   : 0);
     return {
         skinSize().width() - 15, y, Skins::PlaylistSprites::kScrollHandle.width(),
         Skins::PlaylistSprites::kScrollHandle.height()
@@ -351,7 +353,8 @@ void PlaylistWindow::drawBottomInfo(QPainter& painter) const {
         painter.setClipRect(QRect(base + QPoint(66, 23), QSize(25, 6)));
         skin().drawText(
             painter, base + QPoint(66, 23),
-            FormatTime(qint64(corePlayer->engine()->positionSeconds())).rightJustified(5, u' ')
+            FormatTime(static_cast<qint64>(corePlayer->engine()->positionSeconds()))
+                .rightJustified(5, u' ')
         );
         painter.restore();
     }
@@ -526,9 +529,12 @@ bool PlaylistWindow::skinMousePress(QPoint pos, Qt::MouseButton button) {
         const QRect handle = scrollHandleRect();
         if (pos.y() < handle.y() || pos.y() >= handle.y() + handle.height()) {
             const QRect listArea = listRect();
-            const double fraction = double(pos.y() - listArea.y() - handle.height() / 2)
+            const double fraction =
+                static_cast<double>(pos.y() - listArea.y() - handle.height() / 2)
                 / std::max(1, listArea.height() - handle.height());
-            setScrollOffset(int(std::lround(std::clamp(fraction, 0.0, 1.0) * maxScroll())));
+            setScrollOffset(
+                static_cast<int>(std::lround(std::clamp(fraction, 0.0, 1.0) * maxScroll()))
+            );
             dragStartScroll = scrollRow;
         }
         update();
@@ -552,9 +558,13 @@ void PlaylistWindow::skinMouseMove(QPoint pos) {
             const QPoint delta = pos - dragStart;
             setSizeSteps(QSize(
                 dragStartSteps.width()
-                    + int(std::lround(double(delta.x()) / Skins::PlaylistSprites::kStepWidth)),
+                    + static_cast<int>(std::lround(
+                        static_cast<double>(delta.x()) / Skins::PlaylistSprites::kStepWidth
+                    )),
                 dragStartSteps.height()
-                    + int(std::lround(double(delta.y()) / Skins::PlaylistSprites::kStepHeight))
+                    + static_cast<int>(std::lround(
+                        static_cast<double>(delta.y()) / Skins::PlaylistSprites::kStepHeight
+                    ))
             ));
             break;
         }
@@ -562,7 +572,10 @@ void PlaylistWindow::skinMouseMove(QPoint pos) {
             const int travel =
                 std::max(1, listRect().height() - Skins::PlaylistSprites::kScrollHandle.height());
             const int dy = pos.y() - dragStart.y();
-            setScrollOffset(dragStartScroll + int(std::lround(double(dy) / travel * maxScroll())));
+            setScrollOffset(
+                dragStartScroll
+                + static_cast<int>(std::lround(static_cast<double>(dy) / travel * maxScroll()))
+            );
             break;
         }
         default: break;
@@ -648,7 +661,7 @@ void PlaylistWindow::wheelEvent(QWheelEvent* event) {
 }
 
 void PlaylistWindow::keyPressEvent(QKeyEvent* event) {
-    const int count = int(corePlayer->playlist().size());
+    const int count = static_cast<int>(corePlayer->playlist().size());
     if (count == 0) {
         return QWidget::keyPressEvent(event);
     }

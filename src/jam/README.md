@@ -74,7 +74,7 @@ The numbers are a copy of `spec/jam/protocol/schemas/defs.schema.json` and `spec
   as in the Android codec, while Ajv on the server also counts Unicode spaces. A name that ends
   in a non-breaking space passes here and is refused by the server.
 - A number must be whole: JSON has no integer type, so `2.5` for `positionMs` reads as a number and
-  is refused here.
+  is refused here. `Reader::integer` checks the range before `static_cast<qint64>`.
 
 ## `client.h`
 

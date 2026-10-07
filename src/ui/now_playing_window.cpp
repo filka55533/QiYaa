@@ -108,7 +108,7 @@ void NowPlayingWindow::paintContent(QPainter& painter, const QRect& area) {
                                  : QStringLiteral(" (%1)").arg(track->year);
     }
     line(font, style.normal, album);
-    const int seconds = int(track->durationMs / 1000);
+    const int seconds = static_cast<int>(track->durationMs / 1000);
     line(
         font, style.normal,
         QStringLiteral("%1:%2").arg(seconds / 60).arg(seconds % 60, 2, 10, QLatin1Char('0'))

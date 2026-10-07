@@ -22,7 +22,7 @@ QJsonObject ToJson(const Yandex::Track& track) {
         {QStringLiteral("albumId"), track.albumId},
         {QStringLiteral("title"), track.title},
         {QStringLiteral("artists"), QJsonArray::fromStringList(track.artists)},
-        {QStringLiteral("durationMs"), double(track.durationMs)},
+        {QStringLiteral("durationMs"), static_cast<double>(track.durationMs)},
         {QStringLiteral("available"), track.available},
         {QStringLiteral("albumTitle"), track.albumTitle},
         {QStringLiteral("year"), track.year},

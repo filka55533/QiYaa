@@ -36,7 +36,7 @@ constexpr qint64 kMaxTotalBytes = 64 * 1024 * 1024;
 QHash<QString, QByteArray> ReadZip(const QByteArray& zip) {
     QHash<QString, QByteArray> files;
     mz_zip_archive archive{};
-    if (!mz_zip_reader_init_mem(&archive, zip.constData(), size_t(zip.size()), 0)) {
+    if (!mz_zip_reader_init_mem(&archive, zip.constData(), static_cast<size_t>(zip.size()), 0)) {
         throw Skins::Error("not a zip archive (" + std::to_string(zip.size()) + " bytes)");
     }
     const mz_uint count = mz_zip_reader_get_num_files(&archive);
@@ -61,16 +61,18 @@ QHash<QString, QByteArray> ReadZip(const QByteArray& zip) {
             continue;
         }
         if (entry.m_uncomp_size > kMaxEntryBytes
-            || totalBytes + qint64(entry.m_uncomp_size) > kMaxTotalBytes) {
+            || totalBytes + static_cast<qint64>(entry.m_uncomp_size) > kMaxTotalBytes) {
             continue;
         }
-        totalBytes += qint64(entry.m_uncomp_size);
+        totalBytes += static_cast<qint64>(entry.m_uncomp_size);
         size_t size = 0;
         void* data = mz_zip_reader_extract_to_heap(&archive, i, &size, 0);
         if (!data) {
             continue;
         }
-        files.insert(name, QByteArray(static_cast<const char*>(data), qsizetype(size)));
+        files.insert(
+            name, QByteArray(static_cast<const char*>(data), static_cast<qsizetype>(size))
+        );
         mz_free(data);
     }
     mz_zip_reader_end(&archive);
@@ -120,10 +122,10 @@ std::optional<FontCellPosition> FontCell(QChar character) {
     static const QHash<char16_t, std::pair<int, int>> table = [] {
         QHash<char16_t, std::pair<int, int>> cells;
         for (int i = 0; i < 26; ++i) {
-            cells.insert(char16_t(u'a' + i), {0, i});
+            cells.insert(static_cast<char16_t>(u'a' + i), {0, i});
         }
         for (int i = 0; i < 10; ++i) {
-            cells.insert(char16_t(u'0' + i), {1, i});
+            cells.insert(static_cast<char16_t>(u'0' + i), {1, i});
         }
         const std::pair<char16_t, std::pair<int, int>> extra[] = {
             {u'"', {0, 26}}, {u'@', {0, 27}}, {u' ', {0, 30}}, {u'…', {1, 10}},  {u'.', {1, 11}},

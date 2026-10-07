@@ -25,7 +25,7 @@ public:
     QUrl url() const;
     // The same server as a jam server address (http://), as the settings hold it.
     QString serverUrl() const;
-    int count() const { return int(connections.size()); }
+    int count() const { return static_cast<int>(connections.size()); }
     QWebSocket& last() { return *connections.back().socket; }
     // What arrived on the last connection.
     QStringList received() const;

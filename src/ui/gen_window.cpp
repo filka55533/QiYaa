@@ -190,8 +190,10 @@ void GenWindow::skinMouseMove(QPoint pos) {
     }
     const QPoint delta = pos - dragStart;
     setSizeSteps(QSize(
-        dragStartSteps.width() + int(std::lround(double(delta.x()) / kStepWidth)),
-        dragStartSteps.height() + int(std::lround(double(delta.y()) / kStepHeight))
+        dragStartSteps.width()
+            + static_cast<int>(std::lround(static_cast<double>(delta.x()) / kStepWidth)),
+        dragStartSteps.height()
+            + static_cast<int>(std::lround(static_cast<double>(delta.y()) / kStepHeight))
     ));
 }
 

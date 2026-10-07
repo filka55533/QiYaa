@@ -92,7 +92,7 @@ private:
         stack->player.setQueue(
             tracks, "Q", false, {},
             [raw](Core::Player::TrackEvent event, const Yandex::Track& track, double) {
-                raw->events << QStringLiteral("%1:%2").arg(int(event)).arg(track.id);
+                raw->events << QStringLiteral("%1:%2").arg(static_cast<int>(event)).arg(track.id);
             }
         );
         return stack;
@@ -127,7 +127,8 @@ private Q_SLOTS:
         QTest::addColumn<int>("action");
         auto row = [](const char* name, FailureKind kind, int inRow, bool hasNext, bool endless,
                       FailureAction action) {
-            QTest::newRow(name) << int(kind) << inRow << hasNext << endless << int(action);
+            QTest::newRow(name) << static_cast<int>(kind) << inRow << hasNext << endless
+                                << static_cast<int>(action);
         };
         row("ERR-01 network", FailureKind::Network, 2, true, false, FailureAction::WaitForNetwork);
         row("ERR-04 first broken", FailureKind::Track, 0, true, false, FailureAction::Next);
@@ -146,7 +147,10 @@ private Q_SLOTS:
         QFETCH(bool, endless);
         QFETCH(int, action);
         QCOMPARE(
-            int(Core::DecideOnFailure(FailureKind(kind), failuresInRow, hasNext, endless)), action
+            static_cast<int>(Core::DecideOnFailure(
+                static_cast<FailureKind>(kind), failuresInRow, hasNext, endless
+            )),
+            action
         );
     }
 

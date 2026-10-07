@@ -423,7 +423,7 @@ void HostSession::search(const SearchRequest& message) {
                 for (const Yandex::Track& track : tracks) {
                     const std::optional<Track> jamTrack =
                         track.available ? JamTrackOf(track) : std::nullopt;
-                    if (jamTrack && found.size() < size_t(kMaxSearchResults)) {
+                    if (jamTrack && found.size() < static_cast<size_t>(kMaxSearchResults)) {
                         found.push_back(*jamTrack);
                     }
                 }

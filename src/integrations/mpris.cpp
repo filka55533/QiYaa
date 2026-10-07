@@ -96,7 +96,7 @@ Mpris::Mpris(
         );
     });
     connect(mediaControls, &MediaControls::seeked, playerAdaptor, [playerAdaptor](double seconds) {
-        Q_EMIT playerAdaptor->Seeked(qlonglong(seconds * 1e6));
+        Q_EMIT playerAdaptor->Seeked(static_cast<qlonglong>(seconds * 1e6));
     });
 }
 
@@ -129,7 +129,7 @@ QVariantMap Mpris::metadata() const {
     }
     QVariantMap fields{
         {QStringLiteral("mpris:trackid"), QVariant::fromValue(TrackPath(track->id))},
-        {QStringLiteral("mpris:length"), qlonglong(track->durationMs) * 1000},
+        {QStringLiteral("mpris:length"), static_cast<qlonglong>(track->durationMs) * 1000},
         {QStringLiteral("xesam:title"), track->title},
         {QStringLiteral("xesam:artist"), track->artists},
         {QStringLiteral("xesam:url"), track->webUrl().toString()},
@@ -207,12 +207,12 @@ double MprisPlayerAdaptor::volume() const {
 
 void MprisPlayerAdaptor::setVolume(double value) {
     if (const auto& setVolumeHook = mpris->controls()->hooks().setVolume) {
-        setVolumeHook(int(std::lround(std::clamp(value, 0.0, 1.0) * 100)));
+        setVolumeHook(static_cast<int>(std::lround(std::clamp(value, 0.0, 1.0) * 100)));
     }
 }
 
 qlonglong MprisPlayerAdaptor::position() const {
-    return qlonglong(mpris->controls()->player()->engine()->positionSeconds() * 1e6);
+    return static_cast<qlonglong>(mpris->controls()->player()->engine()->positionSeconds() * 1e6);
 }
 
 bool MprisPlayerAdaptor::canSeek() const {
@@ -254,7 +254,7 @@ void MprisPlayerAdaptor::SetPosition(const QDBusObjectPath& trackId, qlonglong p
     if (!canSeek() || !track || trackId != TrackPath(track->id)) {
         return;
     }
-    if (positionUs < 0 || positionUs > qlonglong(track->durationMs) * 1000) {
+    if (positionUs < 0 || positionUs > static_cast<qlonglong>(track->durationMs) * 1000) {
         return;
     }
     mpris->controls()->seekTo(positionUs / 1e6);

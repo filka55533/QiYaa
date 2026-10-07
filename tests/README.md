@@ -432,7 +432,7 @@ collects a `(value, error)` callback, and `wait()` spins for up to 5 s.
   because the server may have counted the event. `postsSettled` fires only after the fallback
   request has settled too; quitting the app waits for it. The event's `trackId` is
   `<id>:<albumId>`, and `totalPlayedSeconds` is rounded to 0.1 (12.34 → 12.3).
-- The track-event log entries are `"<int(TrackEvent)>:<track id>"`, where 0 is Started,
+- The track-event log entries are `"<static_cast<int>(TrackEvent)>:<track id>"`, where 0 is Started,
   1 Finished and 2 Skipped. Playing another index logs Skipped for the current track.
   Replacing the queue does the same.
 - `PlaybackStack` is a separate `LocalNetworkAccessManager`, `ApiClient`, `Library`, engine and

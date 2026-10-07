@@ -18,7 +18,7 @@ public:
 
     void load(const QString& builtInDirectory, const QString& userDirectory);
 
-    int size() const { return int(presetList.size()); }
+    int size() const { return static_cast<int>(presetList.size()); }
     bool isEmpty() const { return presetList.isEmpty(); }
     const Preset& at(int index) const { return presetList.at(index); }
     int indexOf(const QString& name) const;

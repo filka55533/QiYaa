@@ -419,7 +419,7 @@ void JamWindow::renderJam(Canvas& canvas) {
     const int endTop = canvas.bottom - canvas.buttonHeight();
     const int rowHeight = canvas.buttonHeight() + 1;
     listRows = std::max(0, (endTop - kGap - canvas.y) / rowHeight);
-    listScroll = std::clamp(listScroll, 0, std::max(0, int(guests.size()) - listRows));
+    listScroll = std::clamp(listScroll, 0, std::max(0, static_cast<int>(guests.size()) - listRows));
     if (guests.isEmpty()) {
         canvas.paragraph(tr("Nobody yet. Show the guests the QR code or the link."), canvas.dim);
     }
@@ -482,7 +482,8 @@ void JamWindow::renderSearch(Canvas& canvas) {
     }
     const int rowHeight = canvas.buttonHeight() + 1;
     listRows = std::max(0, (canvas.bottom - canvas.y) / rowHeight);
-    listScroll = std::clamp(listScroll, 0, std::max(0, int(foundTracks.size()) - listRows));
+    listScroll =
+        std::clamp(listScroll, 0, std::max(0, static_cast<int>(foundTracks.size()) - listRows));
     const QString add = tr("To the jam");
     const QString next = tr("Next");
     for (int i = listScroll; i < foundTracks.size() && i < listScroll + listRows; ++i) {
